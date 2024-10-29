@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { login } from '../../services/api';
 import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import './Auth.css'; // Import the CSS file
+import './Auth.css';
 
 function Login({ setRole }) {
   const [formData, setFormData] = useState({ username: '', password: '' });
@@ -13,11 +13,13 @@ function Login({ setRole }) {
     e.preventDefault();
     try {
       const response = await login(formData);
-      const role = response.data.role;
+      const { role, id } = response.data; // Assuming response.data contains role and user ID
 
       if (role) {
         setRole(role);
-        navigate('/dashboard');
+        localStorage.setItem('userRole', role); // Save role in local storage
+        localStorage.setItem('userId', id); // Save user ID in local storage
+        navigate('/dashboard'); // Redirect to the dashboard
       }
     } catch (error) {
       setErrorMessage('Invalid username or password.');

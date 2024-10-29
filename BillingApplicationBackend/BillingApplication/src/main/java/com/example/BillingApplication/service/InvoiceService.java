@@ -1,18 +1,37 @@
 package com.example.BillingApplication.service;
 
+import com.example.BillingApplication.config.PdfGenerator;
+import com.example.BillingApplication.model.Customer;
+import com.example.BillingApplication.model.EmailRequest; // Ensure this is imported
 import com.example.BillingApplication.model.Invoice;
 import com.example.BillingApplication.model.InvoiceItem;
+import com.example.BillingApplication.repository.CustomerRepository;
 import com.example.BillingApplication.repository.InvoiceRepository;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+import org.springframework.mail.javamail.JavaMailSender;
 
+import java.io.ByteArrayOutputStream;
 import java.util.List;
 import java.util.Random;
 
 @Service
 public class InvoiceService {
+    private final JavaMailSender mailSender;
+    private final InvoiceRepository invoiceRepository;
+    private final CustomerRepository customerRepository;
+
     @Autowired
-    private InvoiceRepository invoiceRepository;
+    public InvoiceService(JavaMailSender mailSender, InvoiceRepository invoiceRepository, CustomerRepository customerRepository) {
+        this.mailSender = mailSender;
+        this.invoiceRepository = invoiceRepository;
+        this.customerRepository = customerRepository;
+    }
 
     public Long generateUniqueInvoiceId() {
         Long newId;
@@ -51,7 +70,7 @@ public class InvoiceService {
         // Generate a unique invoice ID
         invoice.setId(generateUniqueInvoiceId());
 
-        // Set status to "Pending" by default
+        // Set status to "Paid" by default
         invoice.setStatus("Paid");
 
         // Calculate the total amount for the invoice
@@ -72,4 +91,44 @@ public class InvoiceService {
     public List<Invoice> getAllInvoices() {
         return invoiceRepository.findAll();
     }
+
+    public boolean sendInvoiceEmail(Long customerId, Long invoiceId) {
+        try {
+            // Retrieve the customer’s email using the customerId
+            Customer customer = customerRepository.findById(customerId)
+                    .orElseThrow(() -> new IllegalArgumentException("Customer not found"));
+
+            // Retrieve the invoice
+            Invoice invoice = getInvoiceById(invoiceId);
+            if (invoice == null) {
+                throw new IllegalArgumentException("Invoice not found");
+            }
+
+            // Generate the PDF
+            ByteArrayOutputStream pdfContent = PdfGenerator.generateInvoicePdf(invoice);
+
+            // Prepare the email with attachment
+            sendEmailWithAttachment(customer.getEmail(), invoice, pdfContent.toByteArray());
+            return true;
+        } catch (Exception e) {
+            System.err.println("Error sending email: " + e.getMessage());
+            e.printStackTrace(); // Print stack trace for more context
+            return false;
+        }
+    }
+
+    private void sendEmailWithAttachment(String customerEmail, Invoice invoice, byte[] pdfContent) throws MessagingException {
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true);
+
+        helper.setTo(customerEmail); // Use the customer's email
+        helper.setSubject("Invoice #" + invoice.getId());
+        helper.setText("Please find attached the invoice for your recent purchase.");
+
+        // Add PDF attachment
+        helper.addAttachment("Invoice_" + invoice.getId() + ".pdf", new ByteArrayResource(pdfContent));
+
+        mailSender.send(message);
+    }
+
 }

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { register } from '../../services/api';
 import { useNavigate } from 'react-router-dom';
-import './Auth.css'; // Import the CSS file
+import './Auth.css';
 
 function Register() {
   const [formData, setFormData] = useState({
@@ -17,16 +17,8 @@ function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const payload = {
-      username: formData.username,
-      email: formData.email,
-      mobilenumber: formData.mobilenumber,
-      password: formData.password,
-      role: formData.role,
-    };
-
     try {
-      await register(payload);
+      await register(formData);
       navigate('/login');
     } catch (error) {
       console.error("Registration error:", error.response ? error.response.data : error.message);

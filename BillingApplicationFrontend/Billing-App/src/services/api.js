@@ -14,12 +14,16 @@ export const login = (data) => api.post('/auth/login', data);
 
 // Product endpoints
 export const getProducts = () => api.get('/products');
+export const getProductDetails = (id) => api.get(`/products/${id}`);
 export const addProduct = (data) => api.post('/products', data); // Endpoint to add a new product
 export const updateProduct = (id, data) => api.put(`/products/${id}`, data); // Endpoint to update a product
 export const deleteProduct = (id) => api.delete(`/products/${id}`); // Endpoint to delete a product
 
 // Customer endpoints
 export const getCustomers = () => api.get('/customers');
+export const getCustomerProfile = (id) => api.get(`/auth/profile/${id}`);
+export const updateCustomerProfile = (userId, data) => 
+  api.put('/customers/profile', { userId, ...data }); 
 export const addCustomer = (data) => api.post('/customers', data); // Endpoint to add a new customer
 export const updateCustomer = (id, data) => api.put(`/customers/${id}`, data); // Endpoint to update a customer
 export const deleteCustomer = (id) => api.delete(`/customers/${id}`); // Endpoint to delete a customer
@@ -28,6 +32,7 @@ export const deleteCustomer = (id) => api.delete(`/customers/${id}`); // Endpoin
 export const getInvoices = () => api.get('/invoices');
 export const generateInvoice = (data) => api.post('/invoices', data); // Endpoint to generate a new invoice
 export const getInvoiceById = (id) => api.get(`/invoices/${id}`); // Endpoint to get invoice details by ID
+export const sendInvoiceEmail = (data) => api.post('/invoices/send-email', data); // Email endpoint
 
 // Cart endpoints
 export const getCartItems = () => api.get('/cart'); // Get all cart items

@@ -11,12 +11,12 @@
   
   .customer-dashboard h2 {
     color: #555;
-    border-bottom: 1px solid #ccc;
-    padding-bottom: 10px;
+    border-block-end: 1px solid #ccc;
+    padding-block-end: 10px;
   }
   
   .customer-dashboard .cart {
-    margin-top: 20px;
+    margin-block-start: 20px;
     border: 1px solid #ccc;
     padding: 10px;
   }

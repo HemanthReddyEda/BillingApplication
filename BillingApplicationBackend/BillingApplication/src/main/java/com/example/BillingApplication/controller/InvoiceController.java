@@ -1,10 +1,11 @@
 package com.example.BillingApplication.controller;
 
+import com.example.BillingApplication.model.EmailRequest; // Ensure this is imported
 import com.example.BillingApplication.model.Invoice;
 import com.example.BillingApplication.service.InvoiceService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.ResponseEntity; // Import ResponseEntity
+import org.springframework.http.HttpStatus; // Import HttpStatus
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,26 +22,32 @@ public class InvoiceController {
     }
 
     @PostMapping
-    public ResponseEntity<Invoice> createInvoice(@RequestBody Invoice invoice) {
-        try {
-            Invoice createdInvoice = invoiceService.createInvoice(invoice);
-            return new ResponseEntity<>(createdInvoice, HttpStatus.CREATED);
-        } catch (Exception e) {
-            // Log the error
-            System.err.println("Error creating invoice: " + e.getMessage());
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public Invoice createInvoice(@RequestBody Invoice invoice) {
+        // Create the invoice
+        Invoice createdInvoice = invoiceService.createInvoice(invoice);
+
+        // Return the created invoice directly
+        return createdInvoice;
     }
 
     @GetMapping
-    public ResponseEntity<List<Invoice>> getAllInvoices() {
-        List<Invoice> invoices = invoiceService.getAllInvoices();
-        return ResponseEntity.ok(invoices); // Return the list directly
+    public List<Invoice> getAllInvoices() {
+        return invoiceService.getAllInvoices(); // Return the list directly
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Invoice> getInvoiceById(@PathVariable Long id) {
-        Invoice invoice = invoiceService.getInvoiceById(id);
-        return invoice != null ? ResponseEntity.ok(invoice) : ResponseEntity.notFound().build();
+    public Invoice getInvoiceById(@PathVariable Long id) {
+        return invoiceService.getInvoiceById(id); // Return the invoice directly
+    }
+
+    // New endpoint to send an invoice email
+    @PostMapping("/send-email")
+    public ResponseEntity<String> sendInvoiceEmail(@RequestBody EmailRequest emailRequest) {
+        boolean emailSent = invoiceService.sendInvoiceEmail(emailRequest.getCustomerId(), emailRequest.getInvoiceId());
+        if (emailSent) {
+            return ResponseEntity.ok("Invoice PDF email sent successfully.");
+        } else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to send invoice PDF email.");
+        }
     }
 }

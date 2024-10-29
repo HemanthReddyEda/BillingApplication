@@ -1,8 +1,9 @@
-import js from '@eslint/js'
-import globals from 'globals'
-import react from 'eslint-plugin-react'
-import reactHooks from 'eslint-plugin-react-hooks'
-import reactRefresh from 'eslint-plugin-react-refresh'
+// .eslintrc.js
+import js from '@eslint/js';
+import globals from 'globals';
+import react from 'eslint-plugin-react';
+import reactHooks from 'eslint-plugin-react-hooks';
+import reactRefresh from 'eslint-plugin-react-refresh';
 
 export default [
   { ignores: ['dist'] },
@@ -17,7 +18,11 @@ export default [
         sourceType: 'module',
       },
     },
-    settings: { react: { version: '18.3' } },
+    settings: { 
+      react: { 
+        version: '18.3' 
+      } 
+    },
     plugins: {
       react,
       'react-hooks': reactHooks,
@@ -33,6 +38,12 @@ export default [
         'warn',
         { allowConstantExport: true },
       ],
+      // Disable the rule for unused vars in React imports
+      'react/react-in-jsx-scope': 'off', // No need for React in scope when using React 17+
+      'no-unused-vars': [
+        'warn',
+        { vars: 'all', varsIgnorePattern: '^_', args: 'after-used', argsIgnorePattern: '^_' }
+      ], // Customize how unused vars are handled
     },
   },
-]
+];

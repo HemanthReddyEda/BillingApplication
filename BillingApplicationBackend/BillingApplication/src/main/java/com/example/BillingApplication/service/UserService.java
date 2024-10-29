@@ -4,6 +4,7 @@ import com.example.BillingApplication.model.Customer;
 import com.example.BillingApplication.model.User;
 import com.example.BillingApplication.repository.CustomerRepository;
 import com.example.BillingApplication.repository.UserRepository;
+import org.apache.velocity.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -62,5 +63,9 @@ public class UserService {
 
     private boolean verifyPassword(String rawPassword, String hashedPassword) {
         return passwordEncoder.matches(rawPassword, hashedPassword); // Verify the password
+    }
+    public User getUserById(Long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id " + id));
     }
 }

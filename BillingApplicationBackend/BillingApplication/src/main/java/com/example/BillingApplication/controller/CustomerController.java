@@ -9,7 +9,9 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/customers")
+@CrossOrigin(origins = "http://localhost:5173") // Allow CORS from the frontend
 public class CustomerController {
+
     @Autowired
     private CustomerService customerService;
 
@@ -32,5 +34,10 @@ public class CustomerController {
     public void deleteCustomer(@PathVariable Long id) {
         customerService.deleteCustomer(id);
     }
-}
+    @PutMapping("/profile")
+    public Customer updateCustomerProfile(@RequestBody Customer customer) {
+        return customerService.updateCustomer(customer.getId(), customer);
+    }
 
+
+}

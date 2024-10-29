@@ -2,6 +2,7 @@ package com.example.BillingApplication.service;
 
 import com.example.BillingApplication.model.Customer;
 import com.example.BillingApplication.repository.CustomerRepository;
+import org.apache.velocity.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -36,12 +37,19 @@ public class CustomerService {
     }
 
     public Customer updateCustomer(Long id, Customer customer) {
-        customer.setId(id);
-        return customerRepository.save(customer);
+        if (customerRepository.existsById(id)) {
+            customer.setId(id);
+            return customerRepository.save(customer);
+        } else {
+            throw new ResourceNotFoundException("Customer not found with id " + id);
+        }
+
     }
 
     public void deleteCustomer(Long id) {
         customerRepository.deleteById(id);
     }
-}
 
+
+
+}

@@ -1,5 +1,6 @@
 package com.example.BillingApplication.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -13,8 +14,12 @@ public class Customer {
     private Long id;
 
     private String name;
+
     private String email;
+
+    @Column(name = "mobile_number")
+    @JsonProperty("mobilenumber")
     private String mobileNumber;
 
-    // Getters and Setters
+    // No need for explicit getters and setters since Lombok's @Data generates them
 }

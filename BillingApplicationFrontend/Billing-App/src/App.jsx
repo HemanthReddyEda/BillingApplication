@@ -21,6 +21,15 @@ function App() {
     }
   }, [role]);
 
+  // SignOut Function
+  const handleSignOut = () => {
+    setRole(''); // Clear role from state
+    localStorage.removeItem('userRole'); // Clear role from localStorage
+    localStorage.removeItem('userId'); // Clear userId from localStorage if you store it there
+    // Optionally clear cart items
+    setCartItems([]);
+  };
+
   const handleAddToCart = (product) => {
     const existingItem = cartItems.find(item => item.id === product.id);
     if (existingItem) {
@@ -64,32 +73,32 @@ function App() {
       <Routes>
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login setRole={setRole} />} />
-        
-        {/* Redirect to the appropriate dashboard based on the role */}
+
+        {/* Protected routes */}
         <Route
           path="/dashboard"
-          element={role === 'ADMIN' ? <AdminDashboard /> : <CustomerDashboard />}
+          element={role === 'ADMIN' ? <AdminDashboard onSignOut={handleSignOut} /> : role === 'CUSTOMER' ? <CustomerDashboard onSignOut={handleSignOut} /> : <Navigate to="/login" />}
         />
 
         {/* Product List and Cart for Customers */}
         <Route
           path="/products"
-          element={<ProductList role={role} onAddToCart={handleAddToCart} />}
+          element={role ? <ProductList role={role} onAddToCart={handleAddToCart} /> : <Navigate to="/login" />}
         />
         <Route
           path="/cart"
-          element={
+          element={role ? (
             <Cart 
               cartItems={cartItems} 
               onRemoveItem={handleRemoveFromCart} 
               onDecreaseQuantity={handleDecreaseQuantity}
               onIncreaseQuantity={handleIncreaseQuantity}
             />
-          }
+          ) : <Navigate to="/login" />}
         />
         <Route
           path="/payment"
-          element={<Payment />}
+          element={role ? <Payment /> : <Navigate to="/login" />}
         />
 
         {/* Fallback for unmatched routes */}
