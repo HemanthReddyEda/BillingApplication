@@ -3,7 +3,6 @@ import {
   generateInvoice,
   sendInvoiceEmail,
   getProductDetails,
-  getInvoiceReports,
   getCustomerReports,
 } from '../../services/api';
 import PropTypes from 'prop-types';
@@ -101,10 +100,6 @@ function GenerateInvoice({ setInvoiceReports, setCustomerReports }) {
         invoiceId: response.data.id,
       });
       setMessage('Invoice generated and email sent successfully!');
-
-      const [invoices, customers] = await Promise.all([getInvoiceReports(), getCustomerReports()]);
-      setInvoiceReports(invoices.data);
-      setCustomerReports(customers.data);
     } catch (error) {
       console.error('Error generating invoice:', error);
       setMessage(`Failed to generate invoice: ${error.response?.data?.message || 'Invalid data sent.'}`);

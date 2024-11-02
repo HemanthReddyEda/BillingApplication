@@ -2,6 +2,8 @@ package com.example.BillingApplication.controller;
 
 import com.example.BillingApplication.model.EmailRequest; // Ensure this is imported
 import com.example.BillingApplication.model.Invoice;
+import com.example.BillingApplication.model.InvoiceReport;
+import com.example.BillingApplication.model.OutstandingInvoiceReport;
 import com.example.BillingApplication.service.InvoiceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity; // Import ResponseEntity
@@ -49,5 +51,16 @@ public class InvoiceController {
         } else {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to send invoice PDF email.");
         }
+    }
+
+    @GetMapping("/reports")
+    public List<InvoiceReport> getInvoiceReports() {
+        return invoiceService.getInvoiceReports();
+    }
+
+    // New endpoint to get outstanding invoices
+    @GetMapping("/outstanding-reports")
+    public List<OutstandingInvoiceReport> getOutstandingInvoices() {
+        return invoiceService.getOutstandingInvoices();
     }
 }

@@ -1,10 +1,7 @@
 package com.example.BillingApplication.service;
 
 import com.example.BillingApplication.config.PdfGenerator;
-import com.example.BillingApplication.model.Customer;
-import com.example.BillingApplication.model.EmailRequest; // Ensure this is imported
-import com.example.BillingApplication.model.Invoice;
-import com.example.BillingApplication.model.InvoiceItem;
+import com.example.BillingApplication.model.*;
 import com.example.BillingApplication.repository.CustomerRepository;
 import com.example.BillingApplication.repository.InvoiceRepository;
 import jakarta.mail.MessagingException;
@@ -17,8 +14,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.mail.javamail.JavaMailSender;
 
 import java.io.ByteArrayOutputStream;
-import java.util.List;
+import java.util.*;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 @Service
 public class InvoiceService {
@@ -132,6 +130,35 @@ public class InvoiceService {
         helper.addAttachment("Invoice_" + invoice.getId() + ".pdf", new ByteArrayResource(pdfContent));
 
         mailSender.send(message);
+    }
+
+    public List<InvoiceReport> getInvoiceReports() {
+        return invoiceRepository.findAll().stream()
+                .map(invoice -> {
+                    InvoiceReport report = new InvoiceReport();
+                    report.setInvoiceId(invoice.getId());
+                    report.setInvoiceDate(invoice.getCreatedAt());
+                    report.setTotalAmount(invoice.getTotalAmount());
+                    report.setPaidAmount(invoice.getPaidAmount()); // Assuming you have this field in Invoice
+                    report.setOutstandingAmount(invoice.getTotalAmount() - invoice.getPaidAmount());
+                    return report;
+                })
+                .collect(Collectors.toList());
+    }
+
+    // New method to get outstanding invoices
+    public List<OutstandingInvoiceReport> getOutstandingInvoices() {
+        return invoiceRepository.findAll().stream()
+                .filter(invoice -> invoice.getTotalAmount() > invoice.getPaidAmount())
+                .map(invoice -> {
+                    OutstandingInvoiceReport report = new OutstandingInvoiceReport();
+                    report.setInvoiceId(invoice.getId());
+                    report.setCustomerId(invoice.getCustomer().getId());
+                    report.setDueDate(invoice.getCreatedAt().plusDays(30)); // Assuming a 30-day payment term
+                    report.setOutstandingAmount(invoice.getTotalAmount() - invoice.getPaidAmount());
+                    return report;
+                })
+                .collect(Collectors.toList());
     }
 
 }

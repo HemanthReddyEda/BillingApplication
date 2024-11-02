@@ -4,6 +4,8 @@ import { getProducts, getCustomers, addCustomer, deleteCustomer } from '../../se
 import ProductList from '../Product/ProductList';
 import GenerateInvoice from '../Invoice/GenerateInvoice';
 import InvoiceList from '../Invoice/InvoiceList';
+import InvoiceReportComponent from '../Reports/InvoiceReportComponent'; // Import report components
+import OutstandingInvoiceReportComponent from '../Reports/OutstandingInvoiceReportComponent'; // Import outstanding invoice report component
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash, faUserPlus, faUsers, faFileInvoice, faFileInvoiceDollar, faSignOutAlt, faBoxOpen, faBars } from '@fortawesome/free-solid-svg-icons';
 import './dashboard.css';
@@ -59,8 +61,7 @@ function AdminDashboard() {
     } finally {
       setLoading(false);
     }
-};
-
+  };
 
   const addNewCustomerField = () => {
     setNewCustomers([...newCustomers, { id: '', name: '', email: '' }]);
@@ -102,9 +103,6 @@ function AdminDashboard() {
       setLoading(false);
     }
   };
-  
-  
-  
 
   const toggleSidebar = () => {
     setSidebarOpen(!isSidebarOpen);
@@ -155,7 +153,12 @@ function AdminDashboard() {
           <li onClick={() => handleSelectSection('generateInvoice')}>
             <FontAwesomeIcon icon={faFileInvoiceDollar} /> Generate Invoice
           </li>
-          {/* Removed the Reports section */}
+          <li onClick={() => handleSelectSection('invoiceReports')}>
+            <FontAwesomeIcon icon={faFileInvoice} /> Invoice Reports
+          </li>
+          <li onClick={() => handleSelectSection('outstandingReports')}>
+            <FontAwesomeIcon icon={faFileInvoiceDollar} /> Outstanding Invoice Reports
+          </li>
         </ul>
       </div>
 
@@ -164,6 +167,8 @@ function AdminDashboard() {
           {currentSection === 'products' && <ProductList role="admin" />}
           {currentSection === 'invoices' && <InvoiceList />}
           {currentSection === 'generateInvoice' && <GenerateInvoice />}
+          {currentSection === 'invoiceReports' && <InvoiceReportComponent />}
+          {currentSection === 'outstandingReports' && <OutstandingInvoiceReportComponent />}
           {currentSection === 'addCustomers' && (
             <div className="customer-section">
               <h3>Add New Customers</h3>

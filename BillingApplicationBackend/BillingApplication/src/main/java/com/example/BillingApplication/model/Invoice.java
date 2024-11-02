@@ -36,4 +36,10 @@ public class Invoice {
                 .mapToDouble(item -> item.getPrice() * item.getQuantity())
                 .sum();
     }
+
+    public Double getPaidAmount() {
+        return products.stream()
+                .mapToDouble(item -> item.getPrice() * item.getQuantity())
+                .sum();
+    }
 }
