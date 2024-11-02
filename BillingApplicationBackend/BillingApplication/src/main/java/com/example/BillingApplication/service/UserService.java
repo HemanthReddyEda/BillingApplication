@@ -12,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
-
 @Service
 public class UserService {
 
@@ -35,6 +34,7 @@ public class UserService {
         // Save customer in customers table if role is CUSTOMER
         if ("CUSTOMER".equalsIgnoreCase(user.getRole())) {
             Customer customer = new Customer();
+            customer.setId(savedUser.getId()); // Set the customer ID to match the user ID
             customer.setName(user.getUsername());
             customer.setEmail(user.getEmail());
             customer.setMobileNumber(user.getMobileNumber());
@@ -64,6 +64,7 @@ public class UserService {
     private boolean verifyPassword(String rawPassword, String hashedPassword) {
         return passwordEncoder.matches(rawPassword, hashedPassword); // Verify the password
     }
+
     public User getUserById(Long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id " + id));

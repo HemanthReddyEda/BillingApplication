@@ -4,13 +4,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.Collection;
+
 
 @Entity
 @Data
 @Table(name = "customers")
 public class Customer {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String name;
@@ -20,6 +21,9 @@ public class Customer {
     @Column(name = "mobile_number")
     @JsonProperty("mobilenumber")
     private String mobileNumber;
+
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY) // Prevents password from being serialized in responses
+    private String password;
 
     // No need for explicit getters and setters since Lombok's @Data generates them
 }

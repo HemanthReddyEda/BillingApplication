@@ -88,6 +88,9 @@ public class InvoiceService {
         invoiceRepository.deleteById(id);
     }
 
+    public List<Customer> getAllCustomers() {
+        return customerRepository.findAll(); // This retrieves all customers
+    }
     public List<Invoice> getAllInvoices() {
         return invoiceRepository.findAll();
     }

@@ -1,0 +1,240 @@
+/* Container for product list */
+.product-list-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Title styling */
+.title {
+    text-align: center;
+    font-size: 2.5rem;
+    margin-bottom: 30px;
+    color: #333;
+}
+
+/* Search bar styling */
+/* Modern search bar styling */
+.search-bar {
+    width: 95%; /* Full width */
+    padding: 12px 20px; /* Slightly increased padding */
+    margin-bottom: 20px;
+    border: none; /* Remove default border */
+    border-radius: 30px; /* More rounded corners */
+    font-size: 1rem; /* Consistency */
+    background: #f7f9fc; /* Light background */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s, transform 0.3s; /* Transition for hover effect */
+}
+
+/* Focus effect for the search bar */
+.search-bar:focus {
+    box-shadow: 0 0 15px rgba(0, 123, 255, 0.5);
+    transform: scale(1.02); /* Slightly enlarge on focus */
+    outline: none; /* Remove default outline */
+}
+
+/* Placeholder styling */
+.search-bar::placeholder {
+    color: #999; /* Placeholder color */
+    font-style: italic;
+}
+
+/* Add hover effect for search bar */
+.search-bar:hover {
+    background: #e3f2fd; /* Change background on hover */
+}
+
+/* Add an icon for the search bar */
+.search-bar-container {
+    position: relative; /* Position for the icon */
+}
+
+.search-icon {
+    position: absolute;
+    left: 15px; /* Position of the icon */
+    top: 50%; /* Center vertically */
+    transform: translateY(-50%);
+    color: #999; /* Icon color */
+}
+
+/* Grid layout for products */
+.product-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+/* Individual product card */
+.product-card {
+    border: 2px solid transparent;
+    background: linear-gradient(#ffffff, #ffffff) padding-box,
+        linear-gradient(45deg, #007bff, #ffc107) border-box;
+    border-radius: 12px;
+    padding: 20px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    height: 450px;
+    justify-content: space-between;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    background: linear-gradient(to top left, #f9f9f9, #e9ecef);
+}
+
+/* Product image styling */
+.product-image {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 2px solid #e0e0e0;
+}
+
+/* Product name styling */
+.product-name {
+    font-size: 1.5rem;
+    color: #007bff;
+    margin: 5px 0;
+}
+
+/* Product description styling */
+.product-description {
+    font-size: 1rem;
+    color: #555;
+    flex-grow: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+}
+
+/* Product price styling */
+.product-price {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-top: 10px;
+    color: green;
+}
+
+/* General button styling */
+button {
+    border: none;
+    color: white;
+    padding: 12px 20px; /* Increased padding for a modern look */
+    border-radius: 30px; /* Rounder corners */
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease; /* Added transition for scale effect */
+    margin: 5px 0; /* Consistent margin */
+    font-weight: 600; /* Slightly bolder text */
+}
+
+/* Add to cart button */
+.add-to-cart-btn {
+    background: linear-gradient(45deg, #28a745, #218838);
+}
+
+.add-to-cart-btn:hover {
+    background: linear-gradient(45deg, #218838, #1e7e34);
+    transform: translateY(-2px); /* Slight upward motion on hover */
+}
+
+/* Edit button */
+.edit-btn {
+    background: linear-gradient(45deg, #ffc107, #e0a800);
+}
+
+.edit-btn:hover {
+    background: linear-gradient(45deg, #e0a800, #d39e00);
+    transform: translateY(-2px); /* Slight upward motion on hover */
+}
+
+/* Delete and remove product buttons */
+.delete-btn,
+.remove-product-btn {
+    background: linear-gradient(45deg, #dc3545, #c82333);
+}
+
+.delete-btn:hover,
+.remove-product-btn:hover {
+    background: linear-gradient(45deg, #c82333, #bd2130);
+    transform: translateY(-2px); /* Slight upward motion on hover */
+}
+
+/* Additional buttons */
+.add-another-btn,
+.add-products-btn,
+.update-btn {
+    background: linear-gradient(45deg, #007bff, #0056b3);
+}
+
+.add-another-btn:hover,
+.add-products-btn:hover,
+.update-btn:hover {
+    background: linear-gradient(45deg, #0056b3, #004085);
+    transform: translateY(-2px); /* Slight upward motion on hover */
+}
+
+/* Update Product button */
+.update-product-btn {
+    background: linear-gradient(45deg, #007bff, #0056b3);
+}
+
+.update-product-btn:hover {
+    background: linear-gradient(45deg, #0056b3, #004085);
+    transform: translateY(-2px); /* Slight upward motion on hover */
+}
+
+/* Cancel Edit button */
+.cancel-edit-button {
+    background-color: #447bac;
+}
+
+.cancel-edit-button:hover {
+    background-color: #5a6268;
+    transform: translateY(-2px); /* Slight upward motion on hover */
+}
+
+/* Cancel button */
+.cancel-edit-btn {
+    background-color: #6c757d;
+}
+
+.cancel-edit-btn:hover {
+    background-color: #5a6268;
+    transform: translateY(-2px); /* Slight upward motion on hover */
+}
+
+/* Product form styling */
+.product-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Form input styling */
+.form-input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+}
+
+/* Error message styling */
+.error-message {
+    color: red;
+    text-align: center;
+    margin: 10px 0;
+}
+button{
+    margin: 3px;
+}

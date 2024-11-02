@@ -1,158 +1,230 @@
 import { useEffect, useState } from 'react';
-import PropTypes from 'prop-types'; // Optional: Add PropTypes for type checking
+import { useNavigate } from 'react-router-dom';
 import { getProducts, getCustomers, addCustomer, deleteCustomer } from '../../services/api';
 import ProductList from '../Product/ProductList';
 import GenerateInvoice from '../Invoice/GenerateInvoice';
-import InvoiceList from '../Invoice/InvoiceList'; // Import InvoiceList
-import './AdminDashboard.css';
+import InvoiceList from '../Invoice/InvoiceList';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTrash, faUserPlus, faUsers, faFileInvoice, faFileInvoiceDollar, faSignOutAlt, faBoxOpen, faBars } from '@fortawesome/free-solid-svg-icons';
+import './dashboard.css';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function AdminDashboard() {
   const [products, setProducts] = useState([]);
   const [customers, setCustomers] = useState([]);
   const [showGenerateInvoice, setShowGenerateInvoice] = useState(false);
-  const [newCustomers, setNewCustomers] = useState([{ name: '', email: '' }]);
-  const [loading, setLoading] = useState(true);
+  const [newCustomers, setNewCustomers] = useState([{ id: '', name: '', email: '' }]);
   const [errorMessage, setErrorMessage] = useState('');
-  const [successMessage, setSuccessMessage] = useState('');
-  const [addingCustomers, setAddingCustomers] = useState(false);
-  const [deletingCustomerId, setDeletingCustomerId] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [currentSection, setCurrentSection] = useState('products'); // Default section
+  const [isSidebarOpen, setSidebarOpen] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchProductsAndCustomers = async () => {
       setLoading(true);
       try {
-        const [productsData, customersData] = await Promise.all([
-          getProducts(),
-          getCustomers(),
-        ]);
-
-        setProducts(productsData.data);
-        setCustomers(customersData.data);
+        const productResponse = await getProducts();
+        const customerResponse = await getCustomers();
+        setProducts(productResponse.data);
+        setCustomers(customerResponse.data);
       } catch (error) {
-        setErrorMessage('Error fetching data. Please try again later.');
         console.error('Error fetching data:', error);
+        setErrorMessage('Error loading data.');
       } finally {
         setLoading(false);
       }
     };
-    fetchData();
+    fetchProductsAndCustomers();
   }, []);
 
-  const handleAddCustomerField = () => {
-    setNewCustomers(prev => [...prev, { name: '', email: '' }]);
-  };
-
-  const handleCustomerChange = (index, field, value) => {
-    setNewCustomers(prevCustomers =>
-      prevCustomers.map((customer, i) => (i === index ? { ...customer, [field]: value } : customer))
-    );
-  };
-
-  const handleBatchAddCustomers = async () => {
-    const validCustomers = newCustomers.filter(customer => customer.name && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customer.email));
-
-    if (validCustomers.length === 0) {
-      setErrorMessage('Please fill out valid names and emails for each customer.');
+  const handleAddCustomer = async () => {
+    const invalidCustomer = newCustomers.find((customer) => !customer.id || !customer.name || !customer.email);
+    if (invalidCustomer) {
+      setErrorMessage('Each customer must have a valid ID, name, and email.');
       return;
     }
 
-    setAddingCustomers(true);
+    setLoading(true);
     try {
-      const addedCustomers = await Promise.all(validCustomers.map(addCustomer));
-      setCustomers(prev => [...prev, ...addedCustomers.map(res => res.data)]);
-      setNewCustomers([{ name: '', email: '' }]);
-      setSuccessMessage('Customers added successfully!');
+      const response = await Promise.all(newCustomers.map((customer) => addCustomer(customer)));
+      setCustomers([...customers, ...response.map((res) => res.data)]);
+      setNewCustomers([{ id: '', name: '', email: '' }]);
       setErrorMessage('');
+      toast.success('Customers added successfully.');
     } catch (error) {
       console.error('Error adding customers:', error);
-      setErrorMessage('Failed to add customers.');
+      setErrorMessage('Failed to add customers. Please check the provided details.');
     } finally {
-      setAddingCustomers(false);
+      setLoading(false);
     }
+};
+
+
+  const addNewCustomerField = () => {
+    setNewCustomers([...newCustomers, { id: '', name: '', email: '' }]);
   };
 
-  const handleDeleteCustomer = async (id) => {
-    setDeletingCustomerId(id);
+  const handleCustomerChange = (index, field, value) => {
+    const updatedCustomers = newCustomers.map((customer, idx) =>
+      idx === index ? { ...customer, [field]: value } : customer
+    );
+    setNewCustomers(updatedCustomers);
+  };
+
+  const handleRemoveCustomerField = (index) => {
+    const updatedCustomers = newCustomers.filter((_, idx) => idx !== index);
+    setNewCustomers(updatedCustomers);
+  };
+
+  const handleDeleteCustomer = async (customerId) => {
+    const confirmDelete = window.confirm("Are you sure you want to delete this customer?");
+    if (!confirmDelete) return;
+  
+    console.log('customerId:', customerId, 'Type:', typeof customerId);
+    setLoading(true);
+  
+    // Use customerId directly, assuming it’s already a valid ID
+    const updatedCustomers = customers.filter((c) => c.id !== customerId); // Ensure matching types
+    setCustomers(updatedCustomers);
+    toast.info('Deleting customer...');
+  
     try {
-      await deleteCustomer(id);
-      setCustomers(prev => prev.filter(customer => customer.id !== id));
-      setSuccessMessage('Customer deleted successfully!');
-      setErrorMessage('');
+      await deleteCustomer(customerId); // Use customerId directly
+      toast.success('Customer deleted successfully.');
     } catch (error) {
       console.error('Error deleting customer:', error);
-      setErrorMessage('Failed to delete customer.');
+      setErrorMessage('Failed to delete customer. Please try again.');
+      // Revert to original state if error occurs
+      setCustomers(customers);
     } finally {
-      setDeletingCustomerId(null);
+      setLoading(false);
     }
+  };
+  
+  
+  
+
+  const toggleSidebar = () => {
+    setSidebarOpen(!isSidebarOpen);
+  };
+
+  const handleSelectSection = (section) => {
+    setCurrentSection(section);
+    setSidebarOpen(false);
   };
 
   return (
     <div className="admin-dashboard">
-      <h1>Admin Dashboard</h1>
+      <div className="navbar">
+        <FontAwesomeIcon
+          icon={faBars}
+          className="hamburger-icon"
+          onClick={toggleSidebar}
+          title="Menu"
+        />
+        <h2 className="navbar-title">Admin Dashboard</h2>
+        <FontAwesomeIcon
+          icon={faSignOutAlt}
+          className="logout-icon"
+          onClick={() => navigate('/logout')}
+          title="Logout"
+        />
+      </div>
       {loading && <p className="loading">Loading...</p>}
-      {errorMessage && <p className="error">{errorMessage}</p>}
-      {successMessage && <p className="success">{successMessage}</p>}
+      {errorMessage && <p className="error-message">{errorMessage}</p>}
 
-      <h2>Products</h2>
-      <ProductList products={products} role="admin" />
-
-      <h2>Customers</h2>
-      <ul>
-        {customers.map(customer => (
-          <li key={customer.id}>
-            {customer.name}
-            <button onClick={() => handleDeleteCustomer(customer.id)} disabled={deletingCustomerId === customer.id}>
-              {deletingCustomerId === customer.id ? 'Deleting...' : 'Delete'}
-            </button>
+      {/* Sidebar */}
+      <div className={`sidebar ${isSidebarOpen ? 'open' : ''}`}>
+        <button className="close-btn" onClick={toggleSidebar}>✖</button>
+        <h3>Admin Menu</h3>
+        <ul>
+          <li onClick={() => handleSelectSection('products')}>
+            <FontAwesomeIcon icon={faBoxOpen} /> Products
           </li>
-        ))}
-      </ul>
+          <li onClick={() => handleSelectSection('customers')}>
+            <FontAwesomeIcon icon={faUsers} /> Customers
+          </li>
+          <li onClick={() => handleSelectSection('addCustomers')}>
+            <FontAwesomeIcon icon={faUserPlus} /> Add New Customers
+          </li>
+          <li onClick={() => handleSelectSection('invoices')}>
+            <FontAwesomeIcon icon={faFileInvoice} /> Invoice List
+          </li>
+          <li onClick={() => handleSelectSection('generateInvoice')}>
+            <FontAwesomeIcon icon={faFileInvoiceDollar} /> Generate Invoice
+          </li>
+          {/* Removed the Reports section */}
+        </ul>
+      </div>
 
-      <h3>Add Multiple New Customers</h3>
-      {newCustomers.map((customer, index) => (
-        <div key={index}>
-          <input
-            placeholder="Name"
-            value={customer.name}
-            onChange={(e) => handleCustomerChange(index, 'name', e.target.value)}
-          />
-          <input
-            placeholder="Email"
-            value={customer.email}
-            onChange={(e) => handleCustomerChange(index, 'email', e.target.value)}
-          />
+      <div className="dashboard-body">
+        <div className="content">
+          {currentSection === 'products' && <ProductList role="admin" />}
+          {currentSection === 'invoices' && <InvoiceList />}
+          {currentSection === 'generateInvoice' && <GenerateInvoice />}
+          {currentSection === 'addCustomers' && (
+            <div className="customer-section">
+              <h3>Add New Customers</h3>
+              {newCustomers.map((customer, index) => (
+                <div key={index} className="customer-form">
+                  <input
+                    className="customer-input"
+                    placeholder="Customer ID"
+                    value={customer.id}
+                    onChange={(e) => handleCustomerChange(index, 'id', e.target.value)}
+                  />
+                  <input
+                    className="customer-input"
+                    placeholder="Name"
+                    value={customer.name}
+                    onChange={(e) => handleCustomerChange(index, 'name', e.target.value)}
+                  />
+                  <input
+                    className="customer-input"
+                    placeholder="Email"
+                    value={customer.email}
+                    onChange={(e) => handleCustomerChange(index, 'email', e.target.value)}
+                  />
+                  <button className="btn btn-remove" onClick={() => handleRemoveCustomerField(index)}>
+                    Remove
+                  </button>
+                </div>
+              ))}
+              <button className="btn" onClick={addNewCustomerField}>
+                <FontAwesomeIcon icon={faUserPlus} /> Add Another Customer
+              </button>
+              <button className="btn btn-add" onClick={handleAddCustomer}>Add Customers</button>
+            </div>
+          )}
+          {currentSection === 'customers' && (
+            <div className="customer-section">
+              <h3>Customers</h3>
+              {customers.length === 0 ? (
+                <p>No customers available.</p>
+              ) : (
+                customers.map((customer) => (
+                  <div key={customer.id} className="customer-card">
+                    <div className="customer-info">
+                      <p>ID: {customer.id}</p>
+                      <p>Name: {customer.name}</p>
+                      <p>Email: {customer.email}</p>
+                    </div>
+                    <button className="btn btn-delete" onClick={() => handleDeleteCustomer(customer.id)}>
+                      <FontAwesomeIcon icon={faTrash} /> Delete
+                    </button>
+                  </div>
+                ))
+              )}
+            </div>
+          )}
         </div>
-      ))}
-      <button onClick={handleAddCustomerField}>Add Another Customer</button>
-      <button onClick={handleBatchAddCustomers} disabled={addingCustomers}>
-        {addingCustomers ? 'Adding...' : 'Submit All Customers'}
-      </button>
+      </div>
 
-      <h2>Generate Invoice</h2>
-      <button onClick={() => setShowGenerateInvoice(!showGenerateInvoice)}>
-        {showGenerateInvoice ? 'Hide Invoice Form' : 'Show Invoice Form'}
-      </button>
-
-      {showGenerateInvoice && <GenerateInvoice />}
-
-      <h2>Recent Invoices</h2>
-      <InvoiceList /> {/* Display the InvoiceList component here */}
-
+      <ToastContainer />
     </div>
   );
 }
-
-// PropTypes for the AdminDashboard component
-AdminDashboard.propTypes = {
-  products: PropTypes.array,
-  customers: PropTypes.array,
-  showGenerateInvoice: PropTypes.bool,
-  newCustomers: PropTypes.array,
-  loading: PropTypes.bool,
-  errorMessage: PropTypes.string,
-  successMessage: PropTypes.string,
-  addingCustomers: PropTypes.bool,
-  deletingCustomerId: PropTypes.number,
-};
 
 export default AdminDashboard;

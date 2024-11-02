@@ -1,0 +1,75 @@
+.outerRegister{
+    background: linear-gradient(60deg, violet, lightblue, rgb(77, 77, 198));
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.outerWindow {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(60deg, violet, lightblue, rgb(77, 77, 198));
+    width: 100vw;
+    height: 100vh;
+    color: #333;
+}
+
+.auth-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: azure;
+    width: 90%;
+    max-width: 400px;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.auth-container input,
+.auth-container select {
+    margin: 10px 0;
+    padding: 10px;
+    width: 97%;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+}
+
+.auth-container button {
+    margin-top: 10px;
+    padding: 10px;
+    width: 100%;
+    background-color: rgb(77, 77, 198);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.auth-container button:hover {
+    background-color: rgb(50, 50, 150);
+}
+
+.auth-container .error {
+    color: red;
+    font-size: 0.9em;
+    margin-top: 10px;
+}
+
+.auth-container p {
+    margin-top: 20px;
+    font-size: 0.9em;
+}
+
+.auth-container p a {
+    color: rgb(77, 77, 198);
+    text-decoration: none;
+}
+
+.auth-container p a:hover {
+    text-decoration: underline;
+}
